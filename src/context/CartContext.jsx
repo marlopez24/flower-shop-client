@@ -1,18 +1,19 @@
 import React, { createContext, useState } from "react";
 
-const CartContext = createContext();
+// Named export for the context
+// eslint-disable-next-line react-refresh/only-export-components
+export const CartContext = createContext();
 
+// Provider component
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
 
-  const addToCart = (item) => setCart((prev) => [...prev, item]);
-  const removeFromCart = (id) => setCart((prev) => prev.filter((item) => item.id !== id));
+  const addToCart = (item) => setCart([...cart, item]);
+  const clearCart = () => setCart([]);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart }}>
+    <CartContext.Provider value={{ cart, addToCart, clearCart }}>
       {children}
     </CartContext.Provider>
   );
 };
-
-export default CartContext;
