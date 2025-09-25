@@ -36,17 +36,27 @@ const updateStatus = async (orderId, newStatus) => {
     }
 };
 
+const handleDelete = async(orderId) => {
+    try {
+        await axios.delete(`http://localhost:5000/api/orders/${orderId}/remove`);
+        setOrders(orders.filter((o) => o._id !== orderId))
+
+    } catch (err) {
+        console.log("Error deleting order:", err);
+    }
+};
+
 if (loading) return <p>Loading orders...</p>;
 
 return (
     <div className="p-4 min-h-screen bg-rose-100">
-    <h1 className="text-xl mb-4 text-zinc-700/80 text-center">Worker Dashboard</h1>
+    <h1 className="text-xl mb-4 text-zinc-800/80 text-center">Worker Dashboard</h1>
     {orders.length === 0 ? (
         <p className="text-zinc-700/80">No orders yet.</p>
     ) : (
         <div className="space-y-4 rounded">
         {orders.map((order) => (
-            <div key={order._id} className="border-2 border-zinc-500/90 p-4 rounded shadow">
+            <div key={order._id} className="border-2 border-zinc-500/90 p-4 rounded shadow relative">
             {/* <p><strong>Order ID:</strong> {order._id}</p> */}
             <p><strong>Name:</strong> {order.customer?.name || "N/A"}</p>
             <p><strong>Email:</strong> {order.customer?.email || "N/A"}</p>
@@ -77,7 +87,14 @@ return (
             {order.status === "ready for pickup" && (
                 <p className="mt-2 text-sm text-pink-600/60">Send SMS / Email to customer</p>
             )}
+            <button
+                onClick={() => handleDelete(order._id)}
+                className="bg-red-500/90 text-white px-3 py-1 rounded-full absolute right-2 top-2"
+                >
+                x
+                </button>
             </div>
+            
         ))}
         </div>
     )}
