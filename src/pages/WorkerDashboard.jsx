@@ -2,104 +2,134 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 const WorkerDashboard = () => {
-    const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch all orders
-    const fetchOrders = async () => {
+  const token = localStorage.getItem("token");
+
+  // get all orders
+  const fetchOrders = async () => {
     try {
-        const res = await axios.get("http://localhost:5000/api/orders");
-        setOrders(res.data);
-        setLoading(false);
+      const res = await axios.get("http://localhost:5000/api/orders", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setOrders(res.data);
+      setLoading(false);
     } catch (err) {
-    console.error("Error fetching orders:", err);
-    setLoading(false);
+      console.error("Error fetching orders:", err);
+      setLoading(false);
     }
-};
+  };
 
-useEffect(() => {
+  useEffect(() => {
     fetchOrders();
-}, []);
+  }, []);
 
   // Update order status
-const updateStatus = async (orderId, newStatus) => {
+  const updateStatus = async (orderId, newStatus) => {
     try {
-    const res = await axios.put(`http://localhost:5000/api/orders/${orderId}/status`, { status: newStatus });
+      const res = await axios.put(
+        `http://localhost:5000/api/orders/${orderId}/status`,
+        { status: newStatus },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       // Update local state
-    setOrders((prev) =>
+      setOrders((prev) =>
         prev.map((order) =>
-        order._id === orderId ? { ...order, status: res.data.status } : order
-        )
-    );
+          order._id === orderId ? { ...order, status: res.data.status } : order,
+        ),
+      );
     } catch (err) {
-    console.error("Error updating status:", err.response?.data || err.message);
+      console.error(
+        "Error updating status:",
+        err.response?.data || err.message,
+      );
     }
-};
+  };
 
-const handleDelete = async(orderId) => {
+  const handleDelete = async (orderId) => {
     try {
-        await axios.delete(`http://localhost:5000/api/orders/${orderId}/remove`);
-        setOrders(orders.filter((o) => o._id !== orderId))
-
+      await axios.delete(`http://localhost:5000/api/orders/${orderId}/remove`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setOrders(orders.filter((o) => o._id !== orderId));
     } catch (err) {
-        console.log("Error deleting order:", err);
+      console.log("Error deleting order:", err);
     }
-};
+  };
 
-if (loading) return <p>Loading orders...</p>;
+  if (loading) return <p>Loading orders...</p>;
 
-return (
+  return (
     <div className="p-4 min-h-screen bg-rose-100">
-    <h1 className="text-xl mb-4 text-zinc-800/80 text-center">Worker Dashboard</h1>
-    {orders.length === 0 ? (
-        <p className="text-zinc-700/80">No orders yet.</p>
-    ) : (
+      <h1 className="text-3xl mb-4 text-pink-500/50 font-bold font-balthazar text-center ">
+        Order Dashboard
+      </h1>
+      {orders.length === 0 ? (
+        <p className="text-zinc-700/70">No orders yet.</p>
+      ) : (
         <div className="space-y-4 rounded">
-        {orders.map((order) => (
-            <div key={order._id} className="border-2 border-zinc-500/90 p-4 rounded shadow relative">
-            {/* <p><strong>Order ID:</strong> {order._id}</p> */}
-            <p><strong>Name:</strong> {order.customer?.name || "N/A"}</p>
-            <p><strong>Email:</strong> {order.customer?.email || "N/A"}</p>
-            <p><strong>Address:</strong> {order.customer?.address || "N/A"}</p>
-            <p><strong>Status:</strong> {order.status}</p>
+          {orders.map((order) => (
+            <div
+              key={order._id}
+              className="border-3 border-zinc-500/40 p-4 rounded-lg shadow-lg relative text-pink-600/60"
+            >
+              <p>
+                <strong>Name:</strong> {order.customer?.name || "N/A"}
+              </p>
+              <p>
+                <strong>Email:</strong> {order.customer?.email || "N/A"}
+              </p>
+              <p>
+                <strong>Address:</strong> {order.customer?.address || "N/A"}
+              </p>
+              <p>
+                <strong>Phone:</strong> {order.customer?.phone || "N/A"}
+              </p>
+              <p>
+                <strong>Status:</strong> {order.status}
+              </p>
 
-            <div className="mt-2 space-x-2">
+              <div className="mt-2 space-x-2">
                 <button
-                onClick={() => updateStatus(order._id, "in progress")}
-                className="bg-yellow-400/70 px-2 py-1 rounded"
+                  onClick={() => updateStatus(order._id, "In-Progress")}
+                  className="bg-yellow-400/65 px-2 py-1 rounded text-white"
                 >
-                In Progress
+                  In Progress
                 </button>
                 <button
-                onClick={() => updateStatus(order._id, "ready for pickup")}
-                className="bg-green-500/90 text-white px-2 py-1 rounded"
+                  onClick={() => updateStatus(order._id, "Ready")}
+                  className="bg-green-500/80 text-white px-2 py-1 rounded"
                 >
-                Ready for Pickup
+                  Ready for Pickup
                 </button>
                 <button
-                onClick={() => updateStatus(order._id, "delivered")}
-                className="bg-blue-600/80 text-white px-2 py-1 rounded"
+                  onClick={() => updateStatus(order._id, "Completed")}
+                  className="bg-blue-600/70 text-white px-2 py-1 rounded"
                 >
-                Delivered
+                  Delivered
                 </button>
-            </div>
+              </div>
 
-            {order.status === "ready for pickup" && (
-                <p className="mt-2 text-sm text-pink-600/60">Send SMS / Email to customer</p>
-            )}
-            <button
+              {order.status === "Ready" && (
+                <p className="mt-2 text-sm text-red-600/70">
+                  Send SMS / Email to customer
+                </p>
+              )}
+              <button
                 onClick={() => handleDelete(order._id)}
-                className="bg-red-500/90 text-white px-3 py-1 rounded-full absolute right-2 top-2"
-                >
+                className="bg-red-500/80 text-black/50 px-3 py-1 rounded-full absolute right-2 top-2"
+              >
                 x
-                </button>
+              </button>
             </div>
-            
-        ))}
+          ))}
         </div>
-    )}
+      )}
     </div>
-    );
+  );
 };
 
 export default WorkerDashboard;

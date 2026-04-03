@@ -4,7 +4,12 @@ import { useCart } from "../context/useCart";
 
 const Checkout = () => {
   const { cart, clearCart } = useCart();
-  const [formData, setFormData] = useState({ name: "", address: "", email: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    address: "",
+    email: "",
+    phone: "",
+  });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -14,9 +19,10 @@ const Checkout = () => {
     e.preventDefault();
     try {
       const newOrder = { ...formData, items: cart };
-      console.log("FORMDATA", formData)
+      console.log("FORMDATA", formData);
       await axios.post("http://localhost:5000/api/orders", newOrder);
       alert("Order placed successfully!");
+      location.reload();
       clearCart();
     } catch (err) {
       console.error("Error creating order:", err);
@@ -25,8 +31,13 @@ const Checkout = () => {
 
   return (
     <div className="p-12 min-h-screen bg-rose-100">
-      <h1 className="text-3xl mb-3 text-pink-500/40 font-bold font-balthazar">Checkout</h1>
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-sm border-4 border-zinc-100 p-6 rounded bg-white/30 font-bitter">
+      <h1 className="text-3xl mb-3 text-pink-500/40 font-bold font-balthazar">
+        Checkout
+      </h1>
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 max-w-sm border-4 border-zinc-100 p-6 rounded bg-white/30 font-bitter"
+      >
         <input
           type="text"
           name="name"
@@ -50,6 +61,15 @@ const Checkout = () => {
           name="address"
           placeholder="Your address"
           value={formData.address}
+          onChange={handleChange}
+          className="border p-2 w-full text-pink-500/60 bg-rose-100 rounded"
+          required
+        />
+        <input
+          type="text"
+          name="phone"
+          placeholder="Phone Number"
+          value={formData.phone}
           onChange={handleChange}
           className="border p-2 w-full text-pink-500/60 bg-rose-100 rounded"
           required
