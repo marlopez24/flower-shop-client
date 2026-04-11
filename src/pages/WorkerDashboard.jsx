@@ -50,11 +50,15 @@ const WorkerDashboard = () => {
   };
 
   const handleDelete = async (orderId) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this order?",
+    );
+    if (!confirmed) return;
     try {
       await axios.delete(`http://localhost:5000/api/orders/${orderId}/remove`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setOrders(orders.filter((o) => o._id !== orderId));
+      setOrders((prev) => prev.filter((o) => o._id !== orderId));
     } catch (err) {
       console.log("Error deleting order:", err);
     }
@@ -88,7 +92,23 @@ const WorkerDashboard = () => {
               <p>
                 <strong>Phone:</strong> {order.customer?.phone || "N/A"}
               </p>
-              <p>
+              <p className="mt-1 mb-1">
+                <strong>Order:</strong>
+              </p>
+              {order.cart && order.cart.length > 0 ? (
+                <ul className="ml-4">
+                  {order.cart.map((item, index) => (
+                    <li key={index}>
+                      {index + 1}{" "}
+                      <span className="text-red-500 mb-3">{item.name}</span> : $
+                      {item.price}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No items found.</p>
+              )}
+              <p className="mt-1">
                 <strong>Status:</strong> {order.status}
               </p>
 
@@ -109,7 +129,7 @@ const WorkerDashboard = () => {
                   onClick={() => updateStatus(order._id, "Completed")}
                   className="bg-blue-600/70 text-white px-2 py-1 rounded"
                 >
-                  Delivered
+                  Completed
                 </button>
               </div>
 
