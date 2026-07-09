@@ -80,6 +80,7 @@ const WorkerDashboard = () => {
               key={order._id}
               className="border-3 border-zinc-500/40 p-4 rounded-lg shadow-lg relative text-pink-600/60"
             >
+              <h2 className="text-xl font-bold mb-3">CUSTOMER</h2>
               <p>
                 <strong>Name:</strong> {order.customer?.name || "N/A"}
               </p>
@@ -92,6 +93,7 @@ const WorkerDashboard = () => {
               <p>
                 <strong>Phone:</strong> {order.customer?.phone || "N/A"}
               </p>
+              <h2 className="text-xl font-bold mb-3 mt-3">ORDER DETAILS</h2>
               <p className="mt-1 mb-1">
                 <strong>Order:</strong>
               </p>
@@ -108,13 +110,41 @@ const WorkerDashboard = () => {
               ) : (
                 <p>No items found.</p>
               )}
+              {order.customer?.customFlowers && (
+                <>
+                  <h2 className="text-xl font-bold mt-5 mb-2">
+                    🌸 CUSTOM REQUEST
+                  </h2>
+
+                  <p>
+                    <strong>Size:</strong> {order.customer.customSize}
+                  </p>
+
+                  <p>
+                    <strong>Flowers:</strong> {order.customer.customFlowers}
+                  </p>
+
+                  <p>
+                    <strong>Colors:</strong> {order.customer.customColors}
+                  </p>
+
+                  <p>
+                    <strong>Occasion:</strong> {order.customer.occasion}
+                  </p>
+
+                  <p>
+                    <strong>Notes:</strong> {order.customer.customNotes}
+                  </p>
+                </>
+              )}
+              <h2 className="text-xl font-bold mb-3 mt-3">STATUS</h2>
               <p className="mt-1">
                 <strong>Status:</strong> {order.status}
               </p>
 
               <div className="mt-2 space-x-2">
                 <button
-                  onClick={() => updateStatus(order._id, "In-Progress")}
+                  onClick={() => updateStatus(order._id, "In Progress")}
                   className="bg-yellow-400/65 px-2 py-1 rounded text-white"
                 >
                   In Progress
@@ -131,6 +161,12 @@ const WorkerDashboard = () => {
                 >
                   Completed
                 </button>
+                <button
+                  onClick={() => updateStatus(order._id, "Paid")}
+                  className="bg-blue-600/70 text-white px-2 py-1 rounded"
+                >
+                  Mark as Paid
+                </button>
               </div>
 
               {order.status === "Ready" && (
@@ -138,6 +174,10 @@ const WorkerDashboard = () => {
                   Send SMS / Email to customer
                 </p>
               )}
+              <p>
+                <strong>Payment:</strong> {order.paymentStatus}
+              </p>
+
               <button
                 onClick={() => handleDelete(order._id)}
                 className="bg-red-500/80 text-black/50 px-3 py-1 rounded-full absolute right-2 top-2"

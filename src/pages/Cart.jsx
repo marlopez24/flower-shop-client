@@ -22,7 +22,9 @@ const Cart = () => {
               className="border-4 border-zinc-100 p-1 rounded bg-white/50 font-bitter"
             >
               {item.name} -{" "}
-              <span className="text-red-500/70">${item.price}</span>
+              <span className="text-red-500/70">
+                {item.price ? `${item.price}` : `Starting at $25`}
+              </span>
               <button
                 onClick={() => removeFromCart(index)}
                 className="ml-3 bg-red-400/95 text-white px-1.5 rounded text-sm float-right"
